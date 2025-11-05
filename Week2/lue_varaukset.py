@@ -15,6 +15,7 @@ Puhelin: 0401234567
 Sähköposti: anna.virtanen@example.com
 
 """
+from datetime import datetime
 
 def main():
     # Määritellään tiedoston nimi suoraan koodissa
@@ -23,6 +24,22 @@ def main():
     # Avataan tiedosto ja luetaan sisältö
     with open(varaukset, "r", encoding="utf-8") as f:
         varaus = f.read().strip()
+
+    varaus = varaus.split('|')
+
+    varausnumero = int(varaus[0])
+    varaaja = string(varaus[1])
+    paiva = datetime.strptime(varaus[2], "%Y-%m-%d").date()
+    suomalainenPaiva = paiva.strftime("%d.%m.%Y")
+    aika = datetime.strptime(varaus[3], "%H:%M").time()
+    suomalainenAika = aika.strftime("%H.%M")
+    maara = int(varaus[4])
+    hinta = float(varaus[5])
+    yht = float(varaus[6])
+    maks = bool(varaus[7])
+    kohde = string(varaus[8])
+    puhno = string(varaus[9])
+    sposti = string(varaus[10])
 
     # Tulostetaan varaus konsoliin
     print(varaus)
