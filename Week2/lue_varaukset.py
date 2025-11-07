@@ -15,47 +15,65 @@ Puhelin: 0401234567
 Sähköposti: anna.virtanen@example.com
 
 """
-from datetime import datetime
+#varaus = f.read().strip()
+from datetime import datetime, timedelta, time
 
 def main():
     # Määritellään tiedoston nimi suoraan koodissa
     varaukset = "varaukset.txt"
-
+    TotalPrice=float(0)
+    NotPaid=str('')
+    Morning=str('')
     # Avataan tiedosto ja luetaan sisältö
     with open(varaukset, "r", encoding="utf-8") as f:
-        varaus = f.read().strip()
+        for line in f: 
+            varaus = line.strip()
 
-    varaus = varaus.split('|')
+            varaus = varaus.split('|')
 
-    varausnumero = int(varaus[0])
-    varaaja = string(varaus[1])
-    paiva = datetime.strptime(varaus[2], "%Y-%m-%d").date()
-    suomalainenPaiva = paiva.strftime("%d.%m.%Y")
-    aika = datetime.strptime(varaus[3], "%H:%M").time()
-    suomalainenAika = aika.strftime("%H.%M")
-    maara = int(varaus[4])
-    hinta = float(varaus[5])
-    yht = float(varaus[6])
-    maks = bool(varaus[7])
-    kohde = string(varaus[8])
-    puhno = string(varaus[9])
-    sposti = string(varaus[10])
+            varausnumero = int(varaus[0])
+            varaaja = str(varaus[1])
+            #aikakikkailut
+            paiva = datetime.strptime(varaus[2], "%Y-%m-%d").date()
+            suomalainenPaiva = paiva.strftime("%d.%m.%Y")
+            aika = datetime.strptime(varaus[3], "%H:%M").time()
+            suomalainenAika = aika.strftime("%H.%M")
+            #määräsummakikkailut
+            maara = int(varaus[4])
+            hTemp = float(varaus[5])
+            yhtTemp = maara*hTemp
+            hinta = str(hTemp)
+            hinta = hinta.replace('.',',')
+            yht = str(yhtTemp)
+            yht = yht.replace('.',',')
+            #loppuaika
+            EndDate = datetime.combine(paiva,aika)
+            EndDate = EndDate + timedelta(hours=maara)
+            finEndTime = EndDate.strftime("%d.%m.%Y %H.%M")
+
+            maks = bool(varaus[6])
+            kohde = str(varaus[7])
+            puhno = str(varaus[8])
+            sposti = str(varaus[9])
+
+            #lisätehtävälaskuja
+            TotalPrice = TotalPrice+yhtTemp
+            if not maks:
+                NotPaid = NotPaid+varaaja
+            if aika >=time(8,0) and aika <=time(12,0): 
+                Morning = Morning+' '+varaaja+','
 
     # Tulostetaan varaus konsoliin
-    print(varaus)
+            print(f"{varausnumero}\n{varaaja}\n{suomalainenPaiva}\n{suomalainenAika}\n{maara}\n{hinta}\n{yht}\n{maks}\n{kohde}\n{puhno}\n{sposti}")
+            print('*')
+            print(f"Varaus loppuu {finEndTime}")
+            print()
 
-    # Kokeile näitä
-    #print(varaus.split('|'))
-    #varausId = varaus.split('|')[0]
-    #print(varausId)
-    #print(type(varausId))
-    """
-    Edellisen olisi pitänyt tulostaa numeron 123, joka
-    on oletuksena tekstiä.
-
-    Voit kokeilla myös vaihtaa kohdan [0] esim. seuraavaksi [1]
-    ja testata mikä muuttuu
-    """
+    print('----------')
+    print()
+    print(f"Varauksien tuotto yhteensä: {TotalPrice}")
+    print(f"Nämä eivät ole vielä maksaneet: {NotPaid}")
+    print(f"Nämä alkavat aamupäivällä: {Morning}")
 
 if __name__ == "__main__":
     main()
