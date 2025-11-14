@@ -23,7 +23,7 @@ def hae_tuntimaara(varaus):
     return maara
 def hae_tuntihinta(varaus):
     hinta = float(varaus[5])
-    print(f"Tuntihinta: {hinta} €")
+    print("Tuntihinta: ",f"{hinta:.2f}".replace('.',','), "€")
     return hinta
 def hae_maksettu(varaus):
     maks = bool(varaus[6])
@@ -43,7 +43,7 @@ def hae_sahkoposti(varaus):
     return sposti
 def laske_kokonaishinta(varaus):
     yht = float(varaus[4])*float(varaus[5])
-    print(f"Hinta yhteensä: {yht} €")
+    print(f"Hinta yhteensä: ",f"{yht:.2f}".replace('.',','), "€")
     return yht
 
 def tulosta_varaus(varaus): 
