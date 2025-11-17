@@ -1,59 +1,73 @@
 """
-KESKEN!!!!
+Ohjelma joka tulostaa tiedostosta luettujen varausten alkiot ja niiden tietotyypit
 
-Ohjelma joka lukee tiedostossa olevat varaustiedot
-ja tulostaa ne konsoliin käyttäen funkitoita.
-Alla esimerkkitulostus:
-
-Varausnumero: 123
-Varaaja: Anna Virtanen
-Päivämäärä: 31.10.2025
-Aloitusaika: 10.00
-Tuntimäärä: 2
-Tuntihinta: 19,95 €
-Kokonaishinta: 39,9 €
-Maksettu: Kyllä
-Kohde: Kokoustila A
-Puhelin: 0401234567
-Sähköposti: anna.virtanen@example.com
-
+varausId | nimi | sähköposti | puhelin | varauksenPvm | varauksenKlo | varauksenKesto | hinta | varausVahvistettu | varattuTila | varausLuotu
+------------------------------------------------------------------------
+201 | Muumi Muumilaakso | muumi@valkoinenlaakso.org | 0509876543 | 2025-11-12 | 09:00 | 2 | 18.50 | True | Metsätila 1 | 2025-08-12 14:33:20
+int | str | str | str | datetime.date | datetime.time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+202 | Niiskuneiti Muumilaakso | niisku@muumiglam.fi | 0451122334 | 2025-12-01 | 11:30 | 1 | 12.00 | False | Kukkahuone | 2025-09-03 09:12:48
+int | str | str | str | datetime.date | datetime.time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+203 | Pikku Myy Myrsky | myy@pikkuraivo.net | 0415566778 | 2025-10-22 | 15:45 | 3 | 27.90 | True | Punainen Huone | 2025-07-29 18:05:11
+int | str | str | str | datetime.date | datetime.time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+204 | Nipsu Rahapulainen | nipsu@rahahuolet.me | 0442233445 | 2025-09-18 | 13:00 | 4 | 39.95 | False | Varastotila N | 2025-08-01 10:59:02
+int | str | str | str | datetime.date | datetime.time | int | float | bool | str | datetime
+------------------------------------------------------------------------
+205 | Hemuli Kasvikerääjä | hemuli@kasvikeraily.club | 0463344556 | 2025-11-05 | 08:15 | 2 | 19.95 | True | Kasvitutkimuslabra | 2025-10-09 16:41:55
+int | str | str | str | datetime.date | datetime.time | int | float | bool | str | datetime
+------------------------------------------------------------------------
 """
-from datetime import datetime
+from datetime import datetime, date, time
 
-def hae_varaaja(varaus):
-    nimi = varaus[1]
-    print(f"Varaaja: {nimi}")
+def muunna_varaustiedot(varaus: list) -> list:
+    # Tähän tulee siis varaus oletustietotyypeillä (str)
+    # Varauksessa on 11 saraketta -> Lista -> Alkiot 0-10
+    # Muuta tietotyypit haluamallasi tavalla -> Seuraavassa esimerkki ensimmäisestä alkioista
+    muutettuvaraus = []
+    # Ensimmäisen alkion = varaus[0] muunnos
+    muutettuvaraus.append(int(varaus[0]))
+    # Ja tästä jatkuu
+    muutettuvaraus.append(str(varaus[1]))
+    muutettuvaraus.append(str(varaus[2]))
+    muutettuvaraus.append(str(varaus[3]))
+    pvm = datetime.strptime(str(varaus[4]), "%Y-%m-%d").date()
+    muutettuvaraus.append(pvm)
+    aika =datetime.strptime(str(varaus[5]), "%H:%M").time()
+    muutettuvaraus.append(aika)
+    muutettuvaraus.append(int(varaus[6]))
+    muutettuvaraus.append(float(varaus[7]))
+    muutettuvaraus.append(bool(varaus[8]))
+    muutettuvaraus.append(str(varaus[9]))
+    varaika = datetime.strptime(str(varaus[10]), "%Y-%m-%d %H:%M:%S")
+    muutettuvaraus.append(varaika)
+    return muutettuvaraus
 
 def hae_varaukset(varaustiedosto: str) -> list:
-    # Avataan tiedosto, luetaan ja splitataan sisalto
+    # HUOM! Tälle funktioille ei tarvitse tehdä mitään!
+    # Jos muutat, kommentoi miksi muutit
     varaukset = []
+    varaukset.append(["varausId", "nimi", "sähköposti", "puhelin", "varauksenPvm", "varauksenKlo", "varauksenKesto", "hinta", "varausVahvistettu", "varattuTila", "varausLuotu"])
     with open(varaustiedosto, "r", encoding="utf-8") as f:
         for varaus in f:
             varaus = varaus.strip()
-            varaukset.append(varaus.split('|'))
+            varaustiedot = varaus.split('|')
+            varaukset.append(muunna_varaustiedot(varaustiedot))
     return varaukset
 
 def main():
-    # Maaritellaan tiedoston nimi suoraan koodissa
+    # HUOM! seuraaville riveille ei tarvitse tehdä mitään!
+    # Jos muutat, kommentoi miksi muutit
+    # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
     varaukset = hae_varaukset("varaukset.txt")
-    print(varaukset[0])
-
-
-    # Toteuta loput funktio hae_varaaja(varaus) mukaisesti
-    # Luotavat funktiota tekevat tietotyyppien muunnoksen
-    # ja tulostavat esimerkkitulosteen mukaisesti
-
-    #hae_varausnumero(varaus)
-    #hae_varaaja(varaus)
-    #hae_paiva(varaus)
-    #hae_aloitusaika(varaus)
-    #hae_tuntimaara(varaus)
-    #hae_tuntihinta(varaus)
-    #laske_kokonaishinta(varaus)
-    #hae_maksettu(varaus)
-    #hae_kohde(varaus)
-    #hae_puhelin(varaus)
-    #hae_sahkoposti(varaus)
+    print(" | ".join(varaukset[0]))
+    print("------------------------------------------------------------------------")
+    for varaus in varaukset[1:]:
+        print(" | ".join(str(x) for x in varaus))
+        tietotyypit = [type(x).__name__ for x in varaus]
+        print(" | ".join(tietotyypit))
+        print("------------------------------------------------------------------------")
 
 if __name__ == "__main__":
     main()
