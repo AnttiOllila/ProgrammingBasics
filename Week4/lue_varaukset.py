@@ -38,7 +38,8 @@ def muunna_varaustiedot(varaus: list) -> list:
     muutettuvaraus.append(aika)
     muutettuvaraus.append(int(varaus[6]))
     muutettuvaraus.append(float(varaus[7]))
-    muutettuvaraus.append(bool(varaus[8]))
+    maks = varaus[8].lower()== "true"  
+    muutettuvaraus.append(maks)
     muutettuvaraus.append(str(varaus[9]))
     varaika = datetime.strptime(str(varaus[10]), "%Y-%m-%d %H:%M:%S")
     muutettuvaraus.append(varaika)
@@ -61,13 +62,71 @@ def main():
     # Jos muutat, kommentoi miksi muutit
     # Kutsutaan funkioita hae_varaukset, joka palauttaa kaikki varaukset oikeilla tietotyypeillä
     varaukset = hae_varaukset("varaukset.txt")
-    print(" | ".join(varaukset[0]))
-    print("------------------------------------------------------------------------")
+
+    print()
+    print('1) Vahvistetut varaukset')
     for varaus in varaukset[1:]:
-        print(" | ".join(str(x) for x in varaus))
-        tietotyypit = [type(x).__name__ for x in varaus]
-        print(" | ".join(tietotyypit))
-        print("------------------------------------------------------------------------")
+        if (varaus[8] == True):
+            pvm = datetime.strptime(str(varaus[4]), "%Y-%m-%d")
+            pvm = pvm.strftime("%d-%m-%Y")
+            print(f"{varaus[1]}, {varaus[8]}, {pvm}, klo {varaus[5]}")
+    print()
+
+    print('2 Pitkät varaukset (>= 3 h)')
+    for varaus in varaukset[1:]:
+        if (varaus[6] >= 3):
+            pvm = datetime.strptime(str(varaus[4]), "%Y-%m-%d")
+            pvm = pvm.strftime("%d-%m-%Y")
+            print(f"{varaus[1]}, {pvm}, klo {varaus[5]}, {varaus[6]} h, {varaus[9]}")
+    print()
+
+    print('3 Varausten vahvistusstatus')
+    for varaus in varaukset[1:]:
+        if (varaus[8] == True):
+            print(f"{varaus[1]} -> Vahvistettu ")
+        else :
+            print(f"{varaus[1]} -> Ei vahvistettu ")
+    print()
+
+    print('4 Yhteenveto vahvistuksista')
+    yes=0
+    no=0
+    for varaus in varaukset[1:]: 
+        if (varaus[8] == True):
+            yes += 1
+        else :
+            no += 1
+    print(f"- Vahvistettuja varauksia: {yes} kpl")
+    print(f"- Vahvistamattomia varauksia: {no} kpl")
+    print()
+
+    print('5 Vahvistettujen varausten yhteissumma')
+    money=float(0)
+    for varaus in varaukset[1:]: 
+        if (varaus[8] == True):
+            money = money+(varaus[6]*varaus[7])
+    strmoney=str(money).replace('.',',')
+    print(f"Vahvistettujen varausten tulot: {strmoney} €")
+    print()
+
+ #   print('Kallein varaus:')
+ #  Top=0.0
+ #  for varaus in varaukset[1:]: 
+ #       if (varaus[7] >= Top):
+ #           Top = varaus[7]
+ #           id = varaus  
+ #   print(f"- Nimi: {id[1]}")
+ #   print(f"- Varattu tila: {id[9]}")
+ #   print(f"- Päivä: {id[4]}")
+ #   print(f"- Aika: {id[5]}")
+ #   print(f"- Kesto: {id[6]}")
+ #   print(f"- Kokonaishinta: {Top}")
+
+  #  print('Varausten määrä päivittäin')
+  #  Sort= sorted(str(varaus), key=lambda rivi: rivi[4])
+  #  for rivi in Sort:
+  #      print(f"- {Sort[4]}: 1")
+    #print(Sort)
 
 if __name__ == "__main__":
     main()
