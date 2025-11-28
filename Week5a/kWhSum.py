@@ -72,11 +72,11 @@ def Wday(dno: int) -> str: ### Kömpelö. En ole tyytyväinen.
         DayName="Sunnuntai"
     return DayName
 
-def Cheapest(data: list, Temp:float) -> tuple:
-    """Halvimman rivin tarkastus"""
-    #if Temp <= 
-    min_index = data + ("Ok",)#. min(range(len(data)), key=lambda i: data[i][6])
+def Cheapest(data: list) -> int:
+    """Palauttaa halvimman"""
+    min_index = min(range(len(data)), key=lambda i: data[i]) +1
     return min_index
+
 
 def InitialPrint(): ### Hiukan kömpelö suora printti.
     """Tulostaa otsikkopiirteet"""
@@ -86,6 +86,15 @@ def InitialPrint(): ### Hiukan kömpelö suora printti.
     print("Päivä \t\t Pvm \t\tKulutus [kWh]                   Tuotanto [kWh] \t\t\tNettokulutus KWh")
     print("\t\t\t\t  v1 \t v2 \t v3 \t\t v1 \t v2 \t v3")
 
+def WeekSum(data: list) -> list:
+    """Laskee viikon summat vaiheittain"""
+    totals = [0.0] * 7  
+    for row in data:
+        for i in range(6):
+            totals[i] += row[i+1] / 1000 
+    totals[6] = sum(totals[0:6])
+    return totals
+
 #####################################################
 
 def main():
@@ -94,12 +103,10 @@ def main():
     InitialPrint()
     #print(Numbers)
     SDay = Numbers[0][0].date()
-    CheapTemp=float()
     for i in range(7):
         TDay = SDay + timedelta(days=i)
         DayName = Wday(i+1)
         DayEle = CountPhaseDay(Numbers, TDay)
-        DayEle = Cheapest(DayEle, CheapTemp)
         if OutputType == 1:
             ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}".replace(".",",")
         elif OutputType == 2:
@@ -107,6 +114,11 @@ def main():
         else:
             ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}\t\t{DayEle[3]:.2f}\t{DayEle[4]:.2f}\t{DayEle[5]:.2f}\t\t{DayEle[6]:.2f}".replace(".",",")
         print(f"{DayName} \t {TDay.strftime("%d.%m.%Y")} \t {ProdStr}")
-       
+    print()
+    print(f"Halvin viikonpäivä:\t\t {Wday(Cheapest(ProdStr[6]))}")
+    Sums = WeekSum(Numbers)
+    print(f"Viikon summat vaiheittain\t {Sums[0]:.2f}\t{Sums[1]:.2f}\t{Sums[2]:.2f}\t\t{Sums[3]:.2f}\t{Sums[4]:.2f}\t{Sums[5]:.2f}".replace(".",","))
+    print()
+    
 if __name__ == "__main__":
     main()
