@@ -1,6 +1,5 @@
 # Copyright (C) Antti Ollila
 # License: MIT
-
 """ Tämä ohjelma laskee pyydetyn viikon sähkön kulutuksen ja tuotannon"""
 
 from datetime import datetime, date, timedelta
@@ -49,7 +48,7 @@ def CountPhaseDay(DataIn: list) -> tuple:
     for row in DataIn:
         if row[0].date() == TargetDay:
             for i in range(6):
-                p[i] += row[i+1]
+                p[i] += row[i+1]/1000
                 p[6] += p[i]
     #print(TargetDay)
     return  tuple(p)
@@ -72,6 +71,10 @@ def Wday(dno: int) -> str:
         DayName="Sunnuntai"
     return DayName
 
+def FinDay(IsoDay : list)-> str:
+    pvm = IsoDay[0].strftime("%d.%m.%Y")
+    return pvm
+
 ####################################################
 
 def InitialPrint():
@@ -79,8 +82,8 @@ def InitialPrint():
     print()
     print(f"Viikon {WeekInput} sähkönkulutus ja -tuotanto (kWh, vaiheittain)")
     print("------------------------------------------------------")
-    print("Päivä \t\t Pvm \t\tKulutus [kWh]                   Tuotanto [kWh] \t\t\tNetto")
-    print("\t\t\t\tv1      v2      v3              v1     v2     v3")
+    print("Päivä \t\t Pvm \t\tKulutus [kWh]                   Tuotanto [kWh] \t\t\tNetto KWh")
+    print("\t\t\t\t  v1 \t v2 \t v3 \t\t v1 \t v2 \t v3")
 
 #####################################################
 
@@ -90,11 +93,11 @@ def main():
     InitialPrint()
     #print(Numbers)
     Number=1
-    for i in range(6):
-        DayEle = CountPhaseDay(Numbers)
+    for i in range(7):
         DayName = Wday(Number)
-        #print(DayEle)
-        print(f"{DayName} \t paiva \t\t{DayEle[0]}\t{DayEle[1]}\t{DayEle[2]}\t\t{DayEle[3]}\t{DayEle[4]}\t{DayEle[5]}\t\t{DayEle[6]}")
+        DayEle = CountPhaseDay(Numbers)
+        ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}\t\t{DayEle[3]:.2f}\t{DayEle[4]:.2f}\t{DayEle[5]:.2f}\t\t{DayEle[6]:.2f}".replace(".",",")
+        print(f"{DayName} \t {FinDay(Numbers[0])} \t {ProdStr}")
         Number +=1
        
 if __name__ == "__main__":
