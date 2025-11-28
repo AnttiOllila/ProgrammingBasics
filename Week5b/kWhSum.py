@@ -1,0 +1,101 @@
+# Copyright (C) Antti Ollila
+# License: MIT
+""" Tämä ohjelma laskee pyydetyn viikon sähkön kulutuksen ja tuotannon"""
+
+from datetime import datetime, date, timedelta
+LowList=[]
+WeekInput=int()
+
+def FileInit(File: str) -> list:
+    """Pyytää tiedoston määrittelyyn ja alustaa listarakenteen"""
+    Information = []
+    with open(File, "r", encoding="utf-8") as f:
+        next(f)
+        for Line in f:
+            Line = Line.strip()
+            Fields = Line.split(';')
+            Information.append(DataType(Fields))
+    return Information 
+
+def DataType(Info: list)-> list:
+    """Alustaa tietorakenteen"""
+    InfoLine = []
+    InfoLine.append(datetime.fromisoformat(Info[0]))
+    for i in range(1,7):
+        InfoLine.append(int(Info[i]))
+    InfoLine.append(bool(False))
+    return InfoLine
+
+def CountPhaseDay(DataIn: list, target_day: date) -> tuple:
+    """Laskee vaihesumman annetulle päivälle"""
+    p = [0.0] * 7
+    for row in DataIn:
+        if row[0].date() == target_day:
+            for i in range(6):
+                p[i] += row[i+1] / 1000
+    p[6] = sum(p[0:3]) - sum(p[3:6])
+    return tuple(p)
+
+def Wday(dno: int) -> str: ### Kömpelö. En ole tyytyväinen.
+    """Tuottaa viikonpäivän"""
+    if dno == 1:
+        DayName="Maanantai"
+    elif dno == 2:
+        DayName="Tiistai"
+    elif dno == 3:
+        DayName="Keskiviikko"
+    elif dno == 4:
+        DayName="Torstai"
+    elif dno == 5:
+        DayName="Perjantai"
+    elif dno == 6:
+        DayName="Lauantai"
+    elif dno == 7:
+        DayName="Sunnuntai"
+    return DayName
+
+def Cheapest(data: tuple) -> int:
+    """Palauttaa halvimman"""
+    min_index = min(range(len(data)), key=lambda i: data[i])+1
+    return min_index
+
+def InitialPrint(wk): ### Hiukan kömpelö suora printti.
+    """Tulostaa otsikkopiirteet"""
+    print()
+    print(f"Viikon {wk} sähkönkulutus ja -tuotanto (kWh, vaiheittain)")
+    print("------------------------------------------------------")
+    print("Päivä \t\t Pvm \t\tKulutus [kWh]                   Tuotanto [kWh] \t\t\tNettokulutus KWh")
+    print("\t\t\t\t  v1 \t v2 \t v3 \t\t v1 \t v2 \t v3")
+
+def WeekSum(data: list) -> list:
+    """Laskee viikon summat vaiheittain"""
+    totals = [0.0] * 7  
+    for row in data:
+        for i in range(6):
+            totals[i] += row[i+1] / 1000 
+    totals[6] = sum(totals[0:6])
+    return totals
+
+#####################################################
+
+def main(WeekInput):
+    """Pääfunktio. Ajaa alafunktiot."""
+    Numbers = FileInit(f"viikko{WeekInput}.csv")
+    InitialPrint(WeekInput)
+    SDay = Numbers[0][0].date()
+    for i in range(7):
+        TDay = SDay + timedelta(days=i)
+        DayName = Wday(i+1)
+        DayEle = CountPhaseDay(Numbers, TDay)
+        LowList.append(DayEle[6])
+        ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}\t\t{DayEle[3]:.2f}\t{DayEle[4]:.2f}\t{DayEle[5]:.2f}\t\t{DayEle[6]:.2f}".replace(".",",")
+        print(f"{DayName} \t {TDay.strftime("%d.%m.%Y")} \t {ProdStr}")
+    print()
+    print(f"Halvin viikonpäivä:\t\t {Wday(Cheapest(LowList))}")
+    LowList.clear()
+    Sums = WeekSum(Numbers)
+    print(f"Viikon summat vaiheittain\t {Sums[0]:.2f}\t{Sums[1]:.2f}\t{Sums[2]:.2f}\t\t{Sums[3]:.2f}\t{Sums[4]:.2f}\t{Sums[5]:.2f}".replace(".",","))
+    print()
+    
+if __name__ == "__main__":
+    main()
