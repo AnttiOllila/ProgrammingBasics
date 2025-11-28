@@ -3,6 +3,7 @@
 """ Tämä ohjelma laskee pyydetyn viikon sähkön kulutuksen ja tuotannon"""
 
 from datetime import datetime, date, timedelta
+LowList=[]
 
 while True:
     try:
@@ -72,11 +73,10 @@ def Wday(dno: int) -> str: ### Kömpelö. En ole tyytyväinen.
         DayName="Sunnuntai"
     return DayName
 
-def Cheapest(data: list) -> int:
+def Cheapest(data: tuple) -> int:
     """Palauttaa halvimman"""
-    min_index = min(range(len(data)), key=lambda i: data[i]) +1
+    min_index = min(range(len(data)), key=lambda i: data[i])+1
     return min_index
-
 
 def InitialPrint(): ### Hiukan kömpelö suora printti.
     """Tulostaa otsikkopiirteet"""
@@ -101,12 +101,12 @@ def main():
     """Pääfunktio. Ajaa alafunktiot."""
     Numbers = FileInit(f"viikko{WeekInput}.csv")
     InitialPrint()
-    #print(Numbers)
     SDay = Numbers[0][0].date()
     for i in range(7):
         TDay = SDay + timedelta(days=i)
         DayName = Wday(i+1)
         DayEle = CountPhaseDay(Numbers, TDay)
+        LowList.append(DayEle[6])
         if OutputType == 1:
             ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}".replace(".",",")
         elif OutputType == 2:
@@ -115,7 +115,7 @@ def main():
             ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}\t\t{DayEle[3]:.2f}\t{DayEle[4]:.2f}\t{DayEle[5]:.2f}\t\t{DayEle[6]:.2f}".replace(".",",")
         print(f"{DayName} \t {TDay.strftime("%d.%m.%Y")} \t {ProdStr}")
     print()
-    print(Cheapest(ProdStr[6])) #f"Halvin viikonpäivä:\t\t {Wday(Cheapest(ProdStr[6]))}")
+    print(f"Halvin viikonpäivä:\t\t {Wday(Cheapest(LowList))}")
     Sums = WeekSum(Numbers)
     print(f"Viikon summat vaiheittain\t {Sums[0]:.2f}\t{Sums[1]:.2f}\t{Sums[2]:.2f}\t\t{Sums[3]:.2f}\t{Sums[4]:.2f}\t{Sums[5]:.2f}".replace(".",","))
     print()
