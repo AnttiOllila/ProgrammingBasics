@@ -109,18 +109,18 @@ def main():
     print(f"Vahvistettujen varausten tulot: {strmoney} €")
     print()
 
- #   print('Kallein varaus:')
- #  Top=0.0
- #  for varaus in varaukset[1:]: 
- #       if (varaus[7] >= Top):
- #           Top = varaus[7]
- #           id = varaus  
- #   print(f"- Nimi: {id[1]}")
- #   print(f"- Varattu tila: {id[9]}")
- #   print(f"- Päivä: {id[4]}")
- #   print(f"- Aika: {id[5]}")
- #   print(f"- Kesto: {id[6]}")
- #   print(f"- Kokonaishinta: {Top}")
+    print('Kallein varaus:')
+    Top=0.0
+    for varaus in varaukset[1:]: 
+        if (varaus[7] >= Top):
+            Top = varaus[7]
+            id = varaus  
+    print(f"- Nimi: {id[1]}")
+    print(f"- Varattu tila: {id[9]}")
+    print(f"- Päivä: {id[4]}")
+    print(f"- Aika: {id[5]}")
+    print(f"- Kesto: {id[6]}")
+    print(f"- Kokonaishinta: {Top}")
 
   #  print('Varausten määrä päivittäin')
   #  Sort= sorted(str(varaus), key=lambda rivi: rivi[4])
