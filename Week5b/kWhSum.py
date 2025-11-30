@@ -41,11 +41,11 @@ def Wday(dno: int) -> str: ### Kömpelö. En ole tyytyväinen.
     if dno == 1:
         DayName="Maanantai"
     elif dno == 2:
-        DayName="Tiistai"
+        DayName="Tiistai  "
     elif dno == 3:
         DayName="Keskiviikko"
     elif dno == 4:
-        DayName="Torstai"
+        DayName="Torstai  "
     elif dno == 5:
         DayName="Perjantai"
     elif dno == 6:
@@ -64,8 +64,8 @@ def InitialPrint(wk): ### Hiukan kömpelö suora printti.
     print()
     print(f"Viikon {wk} sähkönkulutus ja -tuotanto (kWh, vaiheittain)")
     print("------------------------------------------------------")
-    print("Päivä \t\t Pvm \t\tKulutus [kWh]                   Tuotanto [kWh] \t\t\tNettokulutus KWh")
-    print("\t\t\t\t  v1 \t v2 \t v3 \t\t v1 \t v2 \t v3")
+    print("Päivä\t\tPvm\t\tKulutus [kWh]\t\t\tTuotanto [kWh]\t\t\tNettokulutus KWh")
+    print("\t\t\t\t v1 \t v2 \t v3 \t\t v1 \t v2 \t v3")
 
 def WeekSum(data: list) -> list:
     """Laskee viikon summat vaiheittain"""
@@ -80,6 +80,8 @@ def WeekSum(data: list) -> list:
 
 def main(WeekInput):
     """Pääfunktio. Ajaa alafunktiot."""
+    TotalWeek=float(0)
+    Total=float(0)
     Numbers = FileInit(f"viikko{WeekInput}.csv")
     InitialPrint(WeekInput)
     SDay = Numbers[0][0].date()
@@ -89,13 +91,17 @@ def main(WeekInput):
         DayEle = CountPhaseDay(Numbers, TDay)
         LowList.append(DayEle[6])
         ProdStr = f"{DayEle[0]:.2f}\t{DayEle[1]:.2f}\t{DayEle[2]:.2f}\t\t{DayEle[3]:.2f}\t{DayEle[4]:.2f}\t{DayEle[5]:.2f}\t\t{DayEle[6]:.2f}".replace(".",",")
-        print(f"{DayName} \t {TDay.strftime("%d.%m.%Y")} \t {ProdStr}")
+        print(f"{DayName}\t{TDay.strftime("%d.%m.%Y")} \t {ProdStr}")
+        TotalWeek = TotalWeek + DayEle[6]
+        Total += DayEle[6]
     print()
     print(f"Halvin viikonpäivä:\t\t {Wday(Cheapest(LowList))}")
     LowList.clear()
     Sums = WeekSum(Numbers)
-    print(f"Viikon summat vaiheittain\t {Sums[0]:.2f}\t{Sums[1]:.2f}\t{Sums[2]:.2f}\t\t{Sums[3]:.2f}\t{Sums[4]:.2f}\t{Sums[5]:.2f}".replace(".",","))
+    print(f"Viikon vaihesummat\t\t {Sums[0]:.2f}\t{Sums[1]:.2f}\t{Sums[2]:.2f}\t\t{Sums[3]:.2f}\t{Sums[4]:.2f}\t{Sums[5]:.2f}".replace(".",","))
     print()
+    print(f"Viikon kulutettu sähkömäärä oli\t{round(Total)} kWh.")
+    return Total
     
 if __name__ == "__main__":
     main()
