@@ -6,6 +6,7 @@ from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 import calendar
 counter=0
+fileName="report.txt"
 
 def ReportType()->int:
     """Pyytää raporttityypin: 1 Päiväkohtainen, 2 Kuukausikohtainen, 3 Vuosikohtainen, 4 Lopeta ohjelma"""
@@ -38,7 +39,7 @@ def ActionAfterReport()->int:
     """Pyytää toiminnon raporttiin: 1 Kirjoita olemassa olevaan, 2 Kirjoita uuteen, 3 Lopeta ohjelma"""
     while True:
         try:
-            Action = int(input("Haluatko:\n1) Kirjoita raportti tiedostoon report.txt?\n2) Luoda uuden raporttitiedoston?\n3) Lopettaa ohjelman?\n"))
+            Action = int(input(f"Haluatko:\n1) Kirjoita raportti tiedostoon {fileName}?\n2) Luoda uuden raporttitiedoston?\n3) Lopettaa ohjelman?\n"))
             if Action in (1,2,3):
                 if Action == 3:
                     sys.exit(f"\nTulostettujen raporttien määrä: {counter}\nHyvää yötä!\n")
@@ -53,23 +54,24 @@ def Report(DataIn: list, StartDay: date, EndDay: date) -> tuple:
     """Käsittelee luettavan tiedon"""
     StartDay=StartDay.replace(tzinfo=ZoneInfo("Europe/Helsinki"))
     EndDay=EndDay.replace(tzinfo=ZoneInfo("Europe/Helsinki"))
-    p = [0.0] * 8
+    p = [0.0] * 10
     TempTemp = []
     for row in DataIn:
         if StartDay <= row[0] <= EndDay:
+            p[7]=50
             p[0] += row[1]
             p[1] += row[2]
             TempTemp.append(row[3])
-            if p[0]-p[1]>=p[4]:
-                p[4]=p[0]-p[1]
-                p[5]=row[3]
-            if p[0]-p[1]<=p[6]:
-                p[6]=p[0]-p[1]
-                p[7]=row[3]    
+            if row[1]-row[2]>=p[4]:
+                p[4]=row[1]-row[2]
+                p[5]=row[0]
+                p[6]=row[3]
+            if row[1]-row[2]<=p[7]:
+                p[7]=row[1]-row[2]
+                p[8]=row[0]
+                p[9]=row[3]    
     p[2] = p[0] - p[1]
     p[3] = sum(TempTemp) / len(TempTemp)
-    print(p[4])                             # debug
-    print(p[6])                             # debug
     return tuple(p)
 
 def FileInit(File: str) -> list:
@@ -102,24 +104,24 @@ def FileName()->str:
         except ValueError:
             print("Kokeile uudestaan")
         NewName=f"{NewName}.txt"
-        print(f"Uusi raporttitiedosto on {NewName}.txt")
+        print(f"Uusi raporttitiedosto on {NewName}")
         return NewName
 
 def main():
-    fileName="report.txt"
+    global fileName
     print("\nTervetuloa sähköstatistiikkaohjelmaan!\n")
     DataMass=FileInit("2025.csv")
-    days= ReportType()
     todo=ActionAfterReport()
     if todo == 2:
         fileName=FileName()
-        days=ReportType()
+        return main()
+    days= ReportType()
     if todo == 1:
         Result=Report(DataMass,days[0],days[1])
-        line = (f"\nHalutun aikavälin\t{days[0].strftime("%d/%m/%Y")} - {days[1].strftime("%d/%m/%Y")} tuloste:\n\nKulutettu energia:\t{Result[0]:.2f} kWh\nTuotettu energia:\t{Result[1]:.2f} kWh\nNettoenergia:\t\t{Result[2]:.2f} kWh\nKeskilämpötila:\t\t{Result[3]:.1f} 'C\n".replace(".",","))
-        print(line)
-        print({Result[4]})# f"{Result[5]}{Result[6]}{Result[7]}")                               #debug
+        line = (f"\nHalutun aikavälin\t{days[0].strftime("%d/%m/%Y")} - {days[1].strftime("%d/%m/%Y")} tuloste:\n\nKulutettu energia:\t{Result[0]:.2f} kWh\nTuotettu energia:\t{Result[1]:.2f} kWh\nNettoenergia:\t\t{Result[2]:.2f} kWh\nKeskilämpötila:\t\t{Result[3]:.1f} 'C\n\nTarkasteluvälin kallein tunti:\t{Result[4]:.2f} kWh in\t{Result[5]} @ {Result[6]:.2f}'C\nTarkasteluvälin halvin tunti:\t{Result[7]:.1f} kWh in\t{Result[8]} @ {Result[9]:.1f}'C".replace(".",","))
+        print(line)     
         WriteToFile(fileName,line)
+        print(fileName)
         global counter
         counter +=1
     return main()
