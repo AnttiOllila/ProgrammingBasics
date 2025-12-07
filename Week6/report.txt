@@ -1,0 +1,8 @@
+
+Halutun aikavälin	01/02/2025 - 01/02/2025 tuloste:
+
+Kulutettu energia:	46,51 kWh
+Tuotettu energia:	0,00 kWh
+Nettoenergia:		46,51 kWh
+Keskilämpötila:		-0,8 'C
+
